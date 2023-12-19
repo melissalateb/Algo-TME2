@@ -13,12 +13,12 @@ public class DefaultTeam {
   //   renvoie une pair de points de la liste, de distance maximum.
   public Line calculDiametre(ArrayList<Point> points) {
     System.out.println("je suis dans la fct calculDiametre");
-    if (points.size()<3) {
+    if (points.size() < 3) {
       return null;
     }
 
-    Point p=points.get(0);
-    Point q=points.get(1);
+    Point p = points.get(0);
+    Point q = points.get(1);
 
     /*******************
      * PARTIE A ECRIRE *
@@ -36,23 +36,23 @@ public class DefaultTeam {
         }
       }
     }
-    return new Line(p,q);
+    return new Line(p, q);
   }
 
   // calculDiametreOptimise: ArrayList<Point> --> Line
   //   renvoie une pair de points de la liste, de distance maximum.
   public Line calculDiametreOptimise(ArrayList<Point> points) {
-    if (points.size()<3) {
+    if (points.size() < 3) {
       return null;
     }
 
-    Point p=points.get(1);
-    Point q=points.get(2);
+    Point p = points.get(1);
+    Point q = points.get(2);
 
     /*******************
      * PARTIE A ECRIRE *
      *******************/
-    return new Line(p,q);
+    return new Line(p, q);
   }
 
   // calculCercleMin: ArrayList<Point> --> Circle
@@ -61,16 +61,65 @@ public class DefaultTeam {
     if (points.isEmpty()) {
       return null;
     }
+    ArrayList<Point> rest = (ArrayList<Point>)points.clone();
+    Point dummy=rest.get(0);
+    Point p=dummy;
+    for (Point s: rest) if (dummy.distance(s)>dummy.distance(p)) p=s;
+    Point q=p;
+    for (Point s: rest) if (p.distance(s)>p.distance(q)) q=s;
+    double cX=.5*(p.x+q.x);
+    double cY=.5*(p.y+q.y);
+    double cRadius=.5*p.distance(q);
+    rest.remove(p);
+    rest.remove(q);
+    while (!rest.isEmpty()){
+      Point s=rest.remove(0);
+      double distanceFromCToS=Math.sqrt((s.x-cX)*(s.x-cX)+(s.y-cY)*(s.y-cY));
+      if (distanceFromCToS<=cRadius) continue;
+      double cPrimeRadius=.5*(cRadius+distanceFromCToS);
+      double alpha=cPrimeRadius/(double)(distanceFromCToS);
+      double beta=(distanceFromCToS-cPrimeRadius)/(double)(distanceFromCToS);
+      double cPrimeX=alpha*cX+beta*s.x;
+      double cPrimeY=alpha*cY+beta*s.y;
+      cRadius=cPrimeRadius;
+      cX=cPrimeX;
+      cY=cPrimeY;
+    }
+    return new Circle(new Point((int)cX,(int)cY),(int)cRadius);
 
-    Point center=points.get(0);
-    int radius=100;
+
+   // Point center = points.get(0);
+    //int radius = 100;
+
+    //Circle circle = null;
+
+    /*
+
+    // Parcourir tous les points pour ajuster le cercle
+    for (int i = 1; i < points.size(); i++) {
+      Point currentPoint = points.get(i);
+
+      // Calculer la distance entre le centre actuel et le point
+      double distanceToCenter = distance(center, currentPoint);
+
+      // Ajuster le rayon si nécessaire
+      if (distanceToCenter > radius) {
+        radius = (int) distanceToCenter;
+      }
+    }
+
+     */
+
+    // Créer et retourner le cercle couvrant minimum
+    //return new Circle(center, radius);
+  }
+    // Méthode pour vérifier si un point est à l'intérieur du cercle
+
 
     /*******************
      * PARTIE A ECRIRE *
      *******************/
-    return new Circle(center,radius);
-  }
-  /
+    //return new Circle(center,radius);
 
   // enveloppeConvexe: ArrayList<Point> --> ArrayList<Point>
   //   renvoie l'enveloppe convexe de la liste.
@@ -116,6 +165,16 @@ public class DefaultTeam {
   }
   private double distance (Point p, Point q){
     return Math.sqrt(Math.pow(p.getX() - q.getX(), 2) + Math.pow(p.getY() - q.getY(), 2));
+  }
+  private boolean estDansCercle (Point point, Circle circle){
+    double distance = distance(circle.getCenter(), point);
+    return distance <= circle.getRadius();
+  }
+  // Méthode pour calculer le milieu entre deux points
+  private Point milieu(Point p, Point q) {
+    double x = (p.getX() + q.getX()) / 2;
+    double y = (p.getY() + q.getY()) / 2;
+    return new Point((int) x, (int) y);
   }
 
 }
