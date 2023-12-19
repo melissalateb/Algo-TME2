@@ -2,6 +2,9 @@ package algorithms;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
 
 import supportGUI.Circle;
 import supportGUI.Line;
@@ -159,27 +162,33 @@ public class DefaultTeam {
     for (Point point : points) {
       maxX = Math.max(maxX, point.x);
     }
-    Point[] Ymin = new Point[maxX];
-    Point[] Ymax = new Point[maxX];
+    HashMap<Integer, Point> Ymin = new HashMap<>();
+    HashMap<Integer, Point> Ymax = new HashMap<>();
     for (Point p : points) {
-      if(Ymin[p.x] ==null || Ymin[p.x].y > p.y){
-        Ymin[p.x] = p;
+      int index = p.x;
+      if (!Ymin.containsKey(index) || Ymin.get(index).y > p.y) {
+        Ymin.put(index, p);
       }
-    }
-    for (Point p : points) {
-      if(Ymax[p.x] ==null || Ymax[p.x].y < p.y){
-        Ymax[p.x] = p;
+      if (!Ymax.containsKey(index) || Ymax.get(index).y < p.y) {
+        Ymax.put(index, p);
       }
     }
     ArrayList<Point> enveloppe = new ArrayList<>();
-    for (Point p : Ymin) {
-      if (p != null) {
-        enveloppe.add(p);
+    ArrayList<Integer> xMinValues = new ArrayList<>(Ymin.keySet());
+    Collections.sort(xMinValues);
+
+    ArrayList<Integer> xMaxValues = new ArrayList<>(Ymax.keySet());
+    Collections.sort(xMaxValues);
+    Collections.reverse(xMaxValues);
+
+    for(int x : xMinValues){
+      if (Ymin.containsKey(x)) {
+        enveloppe.add(Ymin.get(x));
       }
     }
-    for (Point p : Ymax) {
-      if (p != null && !enveloppe.contains(p)) {
-        enveloppe.add(p);
+    for(int x : xMaxValues){
+      if (Ymax.containsKey(x)) {
+        enveloppe.add(Ymax.get(x));
       }
     }
     return enveloppe;
