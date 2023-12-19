@@ -2,7 +2,6 @@ package algorithms;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.*;
 
 import supportGUI.Circle;
 import supportGUI.Line;
@@ -126,7 +125,7 @@ public class DefaultTeam {
       if (points.size()<3) {
         return null;
       }
-      return exercice1(points);
+      return exercice1(triPanier(points));
     }
 
   private double crossProduct(Point p, Point q, Point s, Point t){
@@ -155,10 +154,36 @@ public class DefaultTeam {
 
     return enveloppe; //ici l'enveloppe n'est pas trie dans le sens trigonometrique, et contient des doublons, mais tant pis!
   }
-
-    /*******************
-     * PARTIE A ECRIRE *
-     *******************/
+  private ArrayList<Point> triPanier(ArrayList<Point> points){
+    int maxX = Integer.MIN_VALUE;
+    for (Point point : points) {
+      maxX = Math.max(maxX, point.x);
+    }
+    Point[] Ymin = new Point[maxX];
+    Point[] Ymax = new Point[maxX];
+    for (Point p : points) {
+      if(Ymin[p.x] ==null || Ymin[p.x].y > p.y){
+        Ymin[p.x] = p;
+      }
+    }
+    for (Point p : points) {
+      if(Ymax[p.x] ==null || Ymax[p.x].y < p.y){
+        Ymax[p.x] = p;
+      }
+    }
+    ArrayList<Point> enveloppe = new ArrayList<>();
+    for (Point p : Ymin) {
+      if (p != null) {
+        enveloppe.add(p);
+      }
+    }
+    for (Point p : Ymax) {
+      if (p != null && !enveloppe.contains(p)) {
+        enveloppe.add(p);
+      }
+    }
+    return enveloppe;
+  }
 
   private boolean estDansCercle (Point point, Circle circle){
     double distance = distance(circle.getCenter(), point);
