@@ -121,51 +121,46 @@ public class DefaultTeam {
      *******************/
     //return new Circle(center,radius);
 
-  // enveloppeConvexe: ArrayList<Point> --> ArrayList<Point>
-  //   renvoie l'enveloppe convexe de la liste.
-  public ArrayList<Point> enveloppeConvexe(ArrayList<Point> points){
-    if (points.size()<4) {
-      return points;
-    }
-
-    ArrayList<Point> enveloppe = new ArrayList<Point>();
-
-    for (Point p: points){
-      for (Point q: points){
-        if(p.equals(q)) continue;
-        Point ref = p;
-        for (Point r: points) if (crossProduct(p,q,p,r)!=0) {ref = r; break;}
-        if (ref.equals(p)) {enveloppe.add(p); enveloppe.add(q); continue;}
-        double signeRef = crossProduct(p,q,p,ref);
-        //new Line(p,q);
-        boolean estCote = true;
-
-        for (Point r: points) if(signeRef * crossProduct(p,q,p,r)<0) {estCote = false; break;}
-        // sans le break le temps de calcul sera enorme
-        if (estCote) {enveloppe.add(p); enveloppe.add(q) ;}
-
-        return enveloppe; //ici l'enveloppe n'est pas trie dans le sens trigonometrique, et contient
-
+    //   renvoie l'enveloppe convexe de la liste.
+    public ArrayList<Point> enveloppeConvexe(ArrayList<Point> points){
+      if (points.size()<3) {
+        return null;
       }
-
+      // appeler le tri par panier (pixel) completer ici
+      return exercice1(points);
     }
 
-    enveloppe.add(points.get(0));
-    enveloppe.add(points.get(1));
-    enveloppe.add(points.get(2));
-
-
-    /*******************
-     * PARTIE A ECRIRE *
-     *******************/
-    return points;
-  }
   private double crossProduct(Point p, Point q, Point s, Point t){
     return ((q.x-p.x)*(t.y-s.y)-(q.y-p.y)*(t.x-s.x));
   }
   private double distance (Point p, Point q){
     return Math.sqrt(Math.pow(p.getX() - q.getX(), 2) + Math.pow(p.getY() - q.getY(), 2));
   }
+  private ArrayList<Point> exercice1(ArrayList<Point> points){
+    if (points.size()<4) return points;
+
+    ArrayList<Point> enveloppe = new ArrayList<Point>();
+
+    for (Point p: points) {
+      for (Point q: points) {
+        if (p.equals(q)) continue;
+        Point ref=p;
+        for (Point r: points) if (crossProduct(p,q,p,r)!=0) {ref=r;break;}
+        if (ref.equals(p)) {enveloppe.add(p); enveloppe.add(q); continue;}
+        double signeRef = crossProduct(p,q,p,ref);
+        boolean estCote = true;
+        for (Point r: points) if (signeRef * crossProduct(p,q,p,r)<0) {estCote = false;break;} //ici sans le break le temps de calcul devient horrible
+        if (estCote) {enveloppe.add(p); enveloppe.add(q);}
+      }
+    }
+    // trier l'enveloppe
+    return enveloppe; //ici l'enveloppe n'est pas trie dans le sens trigonometrique, et contient des doublons, mais tant pis!
+  }
+
+    /*******************
+     * PARTIE A ECRIRE *
+     *******************/
+
   private boolean estDansCercle (Point point, Circle circle){
     double distance = distance(circle.getCenter(), point);
     return distance <= circle.getRadius();
