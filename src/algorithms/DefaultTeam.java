@@ -2,7 +2,9 @@ package algorithms;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
 
 import supportGUI.Circle;
 import supportGUI.Line;
@@ -126,7 +128,7 @@ public class DefaultTeam {
       if (points.size()<3) {
         return null;
       }
-      return exercice1(points);
+      return exercice1(triPanier(points));
     }
 
   private double crossProduct(Point p, Point q, Point s, Point t){
@@ -155,10 +157,42 @@ public class DefaultTeam {
 
     return enveloppe; //ici l'enveloppe n'est pas trie dans le sens trigonometrique, et contient des doublons, mais tant pis!
   }
+  private ArrayList<Point> triPanier(ArrayList<Point> points){
+    int maxX = Integer.MIN_VALUE;
+    for (Point point : points) {
+      maxX = Math.max(maxX, point.x);
+    }
+    HashMap<Integer, Point> Ymin = new HashMap<>();
+    HashMap<Integer, Point> Ymax = new HashMap<>();
+    for (Point p : points) {
+      int index = p.x;
+      if (!Ymin.containsKey(index) || Ymin.get(index).y > p.y) {
+        Ymin.put(index, p);
+      }
+      if (!Ymax.containsKey(index) || Ymax.get(index).y < p.y) {
+        Ymax.put(index, p);
+      }
+    }
+    ArrayList<Point> enveloppe = new ArrayList<>();
+    ArrayList<Integer> xMinValues = new ArrayList<>(Ymin.keySet());
+    Collections.sort(xMinValues);
 
-    /*******************
-     * PARTIE A ECRIRE *
-     *******************/
+    ArrayList<Integer> xMaxValues = new ArrayList<>(Ymax.keySet());
+    Collections.sort(xMaxValues);
+    Collections.reverse(xMaxValues);
+
+    for(int x : xMinValues){
+      if (Ymin.containsKey(x)) {
+        enveloppe.add(Ymin.get(x));
+      }
+    }
+    for(int x : xMaxValues){
+      if (Ymax.containsKey(x)) {
+        enveloppe.add(Ymax.get(x));
+      }
+    }
+    return enveloppe;
+  }
 
   private boolean estDansCercle (Point point, Circle circle){
     double distance = distance(circle.getCenter(), point);
